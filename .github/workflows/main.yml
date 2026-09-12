@@ -1,0 +1,30 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Code Quality - ShellCheck (CI)
+        run: shellcheck monitor.sh
+
+  delivery:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Simular Deployment / Criar Artefato (CD)
+        uses: actions/upload-artifact@v4
+        with:
+          name: script-monitoramento
+          path: monitor.sh
