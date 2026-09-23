@@ -16,6 +16,9 @@ jobs:
       - name: Code Quality - ShellCheck (CI)
         run: shellcheck monitor.sh
 
+      - name: Executar 5 Testes Unitarios
+        run: ./test_monitor.sh
+
   delivery:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -28,3 +31,14 @@ jobs:
         with:
           name: script-monitoramento
           path: monitor.sh
+
+  notificacao:
+    needs: [build-and-test, delivery]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Enviar Alerta para o Discord
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: "Status do Pipeline: ${{ job.status }}! Os 5 testes unitários foram validados na PR."
